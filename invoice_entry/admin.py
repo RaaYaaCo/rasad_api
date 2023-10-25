@@ -1,12 +1,15 @@
 from django.contrib import admin
-from . import models
+from .models import InvoiceEntry, InvoiceEntryItem
+
+# Register your models here.
 
 
-@admin.register(models.InvoiceEntry)
+class InvoiceEntryItemAdmin(admin.TabularInline):
+    model = InvoiceEntryItem
+    raw_id_fields = ('p_id',)
+
+
+@admin.register(InvoiceEntry)
 class InvoiceEntryAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.InvoiceEntryItem)
-class InvoiceEntryItemAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['u_wholesaler_id', 'ie_driver', 'ie_total_weight', 'ie_date_time']
+    inlines = (InvoiceEntryItemAdmin,)
