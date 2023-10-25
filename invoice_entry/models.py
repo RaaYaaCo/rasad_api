@@ -32,11 +32,11 @@ class InvoiceEntry(models.Model):
 
 class InvoiceEntryItem(models.Model):
     invoice_entry_id = models.ForeignKey(InvoiceEntry, on_delete=models.PROTECT, verbose_name=_('invoice_entry_id'))
-    product_id = models.ForeignKey(Product.slug, on_delete=models.PROTECT, verbose_name=_('product slug'))
+    product_id = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name=_('product slug'))
     weight = models.FloatField(verbose_name=_('weight'))
 
     def __str__(self):
-        return f'{self.invoice_entry_id.wholesaler_id.o_id.name} | {self.product_id} | {self.weight}'
+        return f'{self.invoice_entry_id.wholesaler_id.o_id.name} | {self.product_id.slug} | {self.weight}'
 
     class Meta:
         verbose_name = _('invoice entry item')
