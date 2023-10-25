@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from core.utils import translate
+from utils.translate import translate
 from .serializers import ProductTypeSerializers, UnitSerializer, \
     DegreeSerializer, ProductSerializers, ProductPriceSerializer, \
     ProductAddSerializers, ProductPriceAddSerializer
