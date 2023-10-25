@@ -37,7 +37,7 @@ class ProductAddSerializers(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-        read_only_fields = ['p_slug']
+        read_only_fields = ['slug']
 
 
 class ProductPriceSerializer(serializers.ModelSerializer):
@@ -46,11 +46,11 @@ class ProductPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductPrice
         fields = '__all__'
-        read_only_fields = ['pp_is_active']
+        read_only_fields = ['is_active']
 
 
 class ProductPriceAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductPrice
         fields = '__all__'
-        read_only_fields = ['pp_is_active']
+        read_only_fields = ['is_active']
