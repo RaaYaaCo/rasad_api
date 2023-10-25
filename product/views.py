@@ -112,7 +112,7 @@ class UnitDetailView(generics.RetrieveUpdateAPIView):
 class ProductListView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializers
-    filterset_fields = ['p_name', 'pt_id', 'd_id']
+    filterset_fields = ['name', 'product_type_id', 'degree_id']
 
 
 class ProductAddView(generics.CreateAPIView):
@@ -133,7 +133,7 @@ class ProductAddView(generics.CreateAPIView):
 class ProductDetailView(generics.RetrieveUpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductAddSerializers
-    lookup_field = "p_slug"
+    lookup_field = "slug"
 
     def retrieve(self, request: Request, *args, **kwargs):
         translate(request)
@@ -156,7 +156,7 @@ class ProductDetailView(generics.RetrieveUpdateAPIView):
 class ProductPriceView(generics.ListAPIView):
     serializer_class = ProductPriceSerializer
     queryset = ProductPrice.objects.filter(pp_is_active=True)
-    filterset_fields = ['p_id', 'pp_price']
+    filterset_fields = ['product_id', 'price']
 
 
 class ProductPriceAddView(generics.GenericAPIView):
@@ -168,9 +168,9 @@ class ProductPriceAddView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:
-                previous_product_price = ProductPrice.objects.get(p_id=request.data['p_id'],
+                previous_product_price = ProductPrice.objects.get(p_id=request.data['product_id'],
                                                                   pp_is_active=True)
-                previous_product_price.pp_is_active = False
+                previous_product_price.is_active = False
                 previous_product_price.save()
                 serializer.save()
                 return Response(data={'data': serializer.data, 'msg': _('new price registered')},
@@ -185,10 +185,10 @@ class ProductPriceAddView(generics.GenericAPIView):
 class EachProductPriceView(generics.GenericAPIView):
     serializer_class = ProductPriceSerializer
     queryset = ProductPrice.objects.filter
-    lookup_field = 'p_id'
+    lookup_field = 'product_id'
 
     def get(self, request: Request, *args, **kwargs):
         translate(request)
-        instance = self.queryset(p_id=self.kwargs['p_id']).order_by('-pp_date_time')
+        instance = self.queryset(p_id=self.kwargs['product_id']).order_by('-created_at')
         serializer = self.serializer_class(instance, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
