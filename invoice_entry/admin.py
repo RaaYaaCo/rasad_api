@@ -8,5 +8,5 @@ class InvoiceEntryAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.InvoiceEntryItem)
-class InvoiceEntryItemAdmin:
+class InvoiceEntryItemAdmin(admin.ModelAdmin):
     pass
