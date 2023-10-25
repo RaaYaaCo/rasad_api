@@ -1,0 +1,96 @@
+version: '3.7'
+
+services: 
+#Redis-----------------------------------------------------------------------------------------
+    rasad-api-redis:
+        image: redis:latest
+        container_name: rasad_api_redis
+        hostname: rasad_api_redis
+        env_file:
+            - .env
+        ports:
+            - "6379:6379"
+        volumes:
+            - rasad_api_redis_data:/data
+        networks:
+            - rasad_api
+        # command: ["sh", "-c", "rm -f /data/dump.rdb && redis-server --save '' --appendonly no --requirepass $PASSWORD_REDIS"]
+        command: ["sh", "-c", "rm -f /data/dump.rdb && redis-server --save '' --appendonly no "]
+        restart: on-failure
+
+
+# #Nginx-----------------------------------------------------------------------------------------
+#     its-nginx:
+#         image: harbor.sahimco.ir/public/nginx:latest
+#         container_name: its_nginx
+#         hostname: its_nginx
+#         ports:
+#             - 80:80
+#             - 443:443
+#         volumes:
+#             - ./docker/compose/nginx_config/nginx.conf:/etc/nginx/nginx.conf
+#             - ./docker/compose/nginx_config/conf.d/:/etc/nginx/conf.d
+#             - its_media_data:/django_media:ro
+#             - its_statics_data:/django_statics:ro
+#         networks:
+#             - its
+#         depends_on:
+#             - its-api
+#             - its-socket
+#         restart: on-failure
+    
+
+#Postgres-----------------------------------------------------------------------------------------
+    rasad-api-postgres:
+        image: postgis/postgis:latest
+        container_name: rasad_api_postgresql
+        hostname: rasad_api_postgresql
+        environment: 
+            - POSTGRES_DB=rasad_api_db
+            - POSTGRES_USER=rasad_api_user
+            - POSTGRES_PASSWORD=hdfjhsfhsdfg
+        ports:
+            - "5432:5432"
+        volumes:
+            - rasad_api_postgresql_data:/var/lib/postgresql/data
+        networks:
+            - rasad_api
+        restart: on-failure
+
+#API-----------------------------------------------------------------------------------------
+    rasad-api:
+        image: rasad-api:latest
+        container_name: rasad_api
+        hostname: rasad_api
+        depends_on: 
+            - rasad-api-postgres
+            - rasad-api-redis
+        ports:
+            - "8088:8088"
+        # command: ["ping", "8.8.8.8"]
+        env_file: 
+            - .env
+        volumes:
+            - rasad_api_media_data:/app/media
+            - rasad_api_static_data:/app/static
+        networks:
+            - rasad_api
+        restart: on-failure
+
+
+
+volumes: 
+    rasad_api_media_data:
+        external: true
+    rasad_api_static_data:
+        external: true
+    rasad_api_postgresql_data:
+        external: true
+    rasad_api_redis_data:
+        external: true
+          
+
+networks:
+    rasad_api:
+        external: true
+        name: rasad_api_net
