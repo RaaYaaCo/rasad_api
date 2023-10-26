@@ -1,5 +1,4 @@
 from django.utils.translation import gettext as _
-from django.core.exceptions import ValidationError
 from django.contrib.auth.models import Group
 
 from rest_framework import serializers
@@ -56,3 +55,8 @@ class LoginPasswordSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True)
     password = serializers.CharField(min_length=8, required=True)
     password2 = serializers.CharField(min_length=8, required=True)
+
+
+class LoginOtpSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(required=True)
+    otp_code = serializers.IntegerField(required=True, min_value=5, max_value=5)
