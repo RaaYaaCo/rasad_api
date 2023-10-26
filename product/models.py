@@ -49,7 +49,7 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         slug = self.name + '-' + self.degree_id.title
-        self.p_slug = slug.replace(' ', '-')
+        self.slug = slug.replace(' ', '-')
         super().save(*args, **kwargs)
 
     class Meta:
