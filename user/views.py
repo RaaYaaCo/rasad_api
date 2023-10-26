@@ -35,7 +35,7 @@ class RegisterLoginView(GenericAPIView):
                     value=otp_code,
                     ex=settings.REDIS_OTP_CODE_TIME
                 )
-                return Response({'msg': _('Login successfully. Unverified user')}, status.HTTP_201_CREATED)
+                return Response({'msg': _('Login successfully. Unverified user'), 'code': otp_code}, status.HTTP_201_CREATED)
         except:
             try:
                 user = User.objects.create(
@@ -54,7 +54,7 @@ class RegisterLoginView(GenericAPIView):
                     value=otp_code,
                     ex=settings.REDIS_OTP_CODE_TIME
                 )
-                return Response({'msg': _('New user successfully registered')}, status.HTTP_201_CREATED)
+                return Response({'msg': _('New user successfully registered'), 'code': otp_code}, status.HTTP_201_CREATED)
 
         return Response({'msg': _('ERROR!!!')}, status.HTTP_400_BAD_REQUEST)
 
@@ -94,3 +94,36 @@ class LoginPasswordView(GenericAPIView):
             return Response({'msg': _('Password or confirm password is not valid')}, status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({'msg': _('Password or confirm password is not valid')}, status.HTTP_400_BAD_REQUEST)
+
+
+class LoginOtpView(GenericAPIView):
+    serializer_class = serializers.LoginOtpSerializer
+
+    def post(self, request: Request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid()
+        try:
+            user = User.objects.get(phone_number=serializer.data['phone_number'])
+            otp_code = settings.REDIS_OTP_CODE.get(name=user.phone_number)
+            otp_code = otp_code.decode('utf-8')
+            if otp_code == serializer.data['otp_code']:
+                user.is_active = True
+                user.save()
+
+                tokens = get_tokens(user)
+                access_token = tokens['Access']
+                refresh_token = tokens['Refresh']
+                settings.REDIS_JWT_TOKEN.set(name=refresh_token, value=refresh_token,
+                                             ex=settings.REDIS_REFRESH_TIME)
+
+                s_user = serializers.UserSerializer(instance=user)
+                return Response(
+                    {
+                        'user': s_user.data,
+                        'token': {'access': access_token, 'refresh': refresh_token}
+                    },
+                    status.HTTP_200_OK
+                )
+            return Response({'msg': _('otp code is not valid')}, status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({'msg': _('otp code is not valid')}, status.HTTP_400_BAD_REQUEST)
