@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from . import models
 from product.serializers import ProductSerializer
-from user.models import UserGroupOrganization
 
 
 class InvoiceEntryAddSerializer(serializers.ModelSerializer):
@@ -17,20 +16,13 @@ class InvoiceEntryItemAddSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UserInvoiceSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = UserGroupOrganization
-
-
 class InvoiceEntrySerializer(serializers.ModelSerializer):
-    wholesaler_id = UserInvoiceSerializer(read_only=True)
 
     class Meta:
         model = models.InvoiceEntry
         fields = ['id',
                   'wholesaler_id',
-                  'ie_driver',
+                  'driver',
                   'full_weight',
                   'empty_weight',
                   'created_at']
