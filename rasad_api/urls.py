@@ -18,11 +18,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from django.urls import path, include
 
 
 # swagger
 from utils.swagger import schema_view
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/product/', include('product.urls')),
     path('api/invoice/entry/', include('invoice_entry.urls')),
     path('api/invoice/sales/', include('invoice_sale.urls')),
+    path('api/feedback/', include('feedback.urls')),
 
     # swagger
     path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
