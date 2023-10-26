@@ -6,10 +6,10 @@ from .models import InvoiceEntry, InvoiceEntryItem
 
 class InvoiceEntryItemAdmin(admin.TabularInline):
     model = InvoiceEntryItem
-    raw_id_fields = ('p_id',)
+    raw_id_fields = ('product_id',)
 
 
 @admin.register(InvoiceEntry)
 class InvoiceEntryAdmin(admin.ModelAdmin):
-    list_display = ['u_wholesaler_id', 'ie_driver', 'ie_total_weight', 'ie_date_time']
+    list_display = ['wholesaler_id', 'driver', 'created_at']
     inlines = (InvoiceEntryItemAdmin,)
