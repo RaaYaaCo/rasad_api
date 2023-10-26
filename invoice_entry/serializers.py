@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from . import models
 from product.serializers import ProductSerializer
+from user.serializers import UgoSerializer
 
 
 class InvoiceEntryAddSerializer(serializers.ModelSerializer):
@@ -17,6 +18,7 @@ class InvoiceEntryItemAddSerializer(serializers.ModelSerializer):
 
 
 class InvoiceEntrySerializer(serializers.ModelSerializer):
+    wholesaler_id = UgoSerializer(read_only=True, many=True)
 
     class Meta:
         model = models.InvoiceEntry
@@ -29,7 +31,7 @@ class InvoiceEntrySerializer(serializers.ModelSerializer):
 
 
 class InvoiceEntryItemSerializer(serializers.ModelSerializer):
-    p_id = ProductSerializer()
+    product_id = ProductSerializer(read_only=True)
 
     class Meta:
         model = models.InvoiceEntryItem
