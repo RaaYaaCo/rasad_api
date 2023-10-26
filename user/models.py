@@ -4,6 +4,8 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.gis.db import models as model
 from django.utils.translation import gettext as _
 
+from .validators import check_phone, isnumeric, check_tel_number
+
 # Create your models here.
 
 
@@ -35,8 +37,20 @@ class OrgType(models.Model):
 
 class User(AbstractUser):
     USERNAME_FIELD = 'phone_number'
-    phone_number = models.CharField(max_length=11, db_index=True, unique=True, verbose_name=_('phone number'))
-    code_melli = models.CharField(max_length=10, db_index=True, unique=True, verbose_name=_('code melli'))
+    phone_number = models.CharField(
+        max_length=11,
+        db_index=True,
+        unique=True,
+        validators=[check_phone],
+        verbose_name=_('phone number')
+    )
+    code_melli = models.CharField(
+        max_length=10,
+        db_index=True,
+        unique=True,
+        validators=[isnumeric],
+        verbose_name=_('code melli')
+    )
     objects = MyUserManager()
 
     def save(self, *args, **kwargs):
@@ -58,7 +72,13 @@ class Organization(models.Model):
     description = models.TextField(verbose_name=_('description'))
     address = models.TextField(verbose_name=_('Organization address'))
     location = model.GeometryField(geography=True, db_index=True, verbose_name=_('Location'))
-    tel = models.CharField(max_length=11, verbose_name=_('tel number'), null=True, blank=True)
+    tel = models.CharField(
+        max_length=11,
+        validators=[isnumeric, check_tel_number],
+        verbose_name=_('tel number'),
+        null=True,
+        blank=True
+    )
     o_type = models.ForeignKey(OrgType, on_delete=models.PROTECT, verbose_name=_('organization type'))
     is_active = models.BooleanField(verbose_name=_('is active'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('created at'))
@@ -88,7 +108,7 @@ class UserGroupOrganization(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('created at'))
 
     def save(self, *args, **kwargs):
-        code = str(self.u_id.id) + str(self.g_id.id) + str(self.o_id.id)
+        code =  str(self.g_id.id) + str(self.o_id.id) + str(self.u_id.id)
         code = int(code)
         self.ugo_code = code
         if self.g_id.name == 'مشتری':
@@ -103,4 +123,3 @@ class UserGroupOrganization(models.Model):
     class Meta:
         verbose_name = _('user group organization')
         verbose_name_plural = _('user group organization')
-
