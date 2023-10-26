@@ -28,6 +28,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/product/', include('product.urls')),
     path('api/invoice-entry/', include('invoice_entry.urls')),
+    path('api/feedback/', include('feedback.urls')),
 
 
     # swagger
