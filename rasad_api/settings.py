@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'invoice_sale',
     'feedback',
     'product',
+    'product_entity'
 ]
 
 MIDDLEWARE = [
