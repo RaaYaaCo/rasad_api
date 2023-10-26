@@ -126,8 +126,9 @@ class ProductAddView(generics.CreateAPIView):
         try:
             serializer.save()
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        except 'duplicate':
-            return Response({'msg': _('you can not register a product with the same name and degree')})
+        except:
+            return Response({'msg': _('you can not register a product with the same name and degree')},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductDetailView(generics.RetrieveUpdateAPIView):
@@ -149,7 +150,7 @@ class ProductDetailView(generics.RetrieveUpdateAPIView):
         try:
             serializer.save()
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        except 'duplicate':
+        except:
             return Response({'msg': _('you can not register a product with the same name and degree')})
 
 
