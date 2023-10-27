@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from .models import InvoiceSales, InvoiceSalesItem
-# from user.serializers import UserInvoiceSerializer
-# from product.serializers import ProductSerializers, ProductPriceSerializer
+from user.serializers import UgoSerializer
+from product.serializers import ProductSerializer, ProductPriceSerializer
 # from store.serializers import StoreSerializer
 
 
@@ -18,23 +18,23 @@ class InvoiceSalesItemAddSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class InvoiceSalesSerializer(serializers.ModelSerializer):
-#     u_wholesaler_id = UserInvoiceSerializer(read_only=True)
-#     u_store_id = StoreSerializer(read_only=True)
-#
-#     class Meta:
-#         model = InvoiceSales
-#         fields = ['id',
-#                   'u_wholesaler_id',
-#                   'u_store_id',
-#                   'is_date_time'
-#                   ]
-#
-#
-# class InvoiceSalesItemSerializer(serializers.ModelSerializer):
-#     p_id = ProductSerializers(read_only=True)
-#     pp_id = ProductPriceSerializer(read_only=True)
-#
-#     class Meta:
-#         model = InvoiceSalesItem
-#         fields = ['id', 'is_id', 'p_id', 'isi_weight', 'pp_id']
+class InvoiceSalesSerializer(serializers.ModelSerializer):
+    wholesaler_ugo = UgoSerializer(read_only=True)
+    store_ugo = UgoSerializer(read_only=True)
+
+    class Meta:
+        model = InvoiceSales
+        fields = ['id',
+                  'wholesaler_ugo',
+                  'store_ugo',
+                  'created_at'
+                  ]
+
+
+class InvoiceSalesItemSerializer(serializers.ModelSerializer):
+    product_id = ProductSerializer(read_only=True)
+    product_price_id = ProductPriceSerializer(read_only=True)
+
+    class Meta:
+        model = InvoiceSalesItem
+        fields = ['id', 'invoice_sales_id', 'product_id', 'weight', 'product_price_id']

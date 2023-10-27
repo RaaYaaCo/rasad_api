@@ -34,6 +34,10 @@ class InvoiceSalesItem(models.Model):
                                          on_delete=models.CASCADE,
                                          db_index=True,
                                          verbose_name=_('Invoice'))
+    product_id = models.ForeignKey(Product,
+                                   on_delete=models.PROTECT,
+                                   db_index=True,
+                                   verbose_name=_('product'))
     product_price_id = models.ForeignKey(ProductPrice,
                                          on_delete=models.CASCADE,
                                          db_index=True,

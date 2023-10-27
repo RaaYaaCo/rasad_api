@@ -6,7 +6,8 @@ from rest_framework import status
 from utils.translate import translate
 from .models import InvoiceSales, InvoiceSalesItem
 from product_entity.models import ProductEntity
-from .serializers import InvoiceSalesAddSerializer, InvoiceSalesItemAddSerializer
+from .serializers import InvoiceSalesAddSerializer, InvoiceSalesItemAddSerializer, InvoiceSalesSerializer, \
+                         InvoiceSalesItemSerializer
 from product.models import ProductPrice
 # from .serializers import InvoiceSalesSerializer,\
 #     InvoiceSalesAddSerializer,\
@@ -60,44 +61,50 @@ class InvoiceSalesItemAddView(GenericAPIView):
                         status=status.HTTP_201_CREATED)
 
 
-# class InvoiceSalesShowAllView(ListAPIView):
-#     serializer_class = InvoiceSalesSerializer
-#     queryset = InvoiceSales.objects.all().order_by('-is_date_time')
-#     filterset_fields = ['u_wholesaler_id', 'u_store_id', 'is_date_time']
-#
-#
-# class InvoiceSalesShowDetailView(RetrieveAPIView):
-#     serializer_class = InvoiceSalesSerializer
-#     queryset = InvoiceSales.objects.all()
-#
-#     def retrieve(self, request: Request, *args, **kwargs):
-#         translate(request)
-#         instance = self.get_object()
-#         serializer = self.serializer_class(instance)
-#         item_instance = InvoiceSalesItem.objects.filter(is_id_id=serializer.data['id'])
-#         item_serializer = InvoiceSalesItemSerializer(item_instance, many=True)
-#         return Response({'invoice': serializer.data, 'items': item_serializer.data}, status.HTTP_200_OK)
-#
-#
-# class InvoiceSalesShowDetailWholesalerView(GenericAPIView):
-#     serializer_class = InvoiceSalesSerializer
-#     queryset = InvoiceSales.objects.all()
-#     lookup_field = 'u_wholesaler_id'
-#
-#     def get(self, request: Request, *args, **kwargs):
-#         translate(request)
-#         invoice_entry = InvoiceSales.objects.filter(u_wholesaler_id_id=self.kwargs['u_wholesaler_id'])
-#         serializer = self.serializer_class(invoice_entry, many=True)
-#         return Response(serializer.data, status.HTTP_200_OK)
-#
-#
-# class InvoiceSalesShowDetailStoreView(GenericAPIView):
-#     serializer_class = InvoiceSalesSerializer
-#     queryset = InvoiceSales.objects.all()
-#     lookup_field = 'u_store_id'
-#
-#     def get(self, request: Request, *args, **kwargs):
-#         translate(request)
-#         invoice_entry = InvoiceSales.objects.filter(u_store_id_id=self.kwargs['u_store_id'])
-#         serializer = self.serializer_class(invoice_entry, many=True)
-#         return Response(serializer.data, status.HTTP_200_OK)
+class InvoiceSalesShowAllView(ListAPIView):
+    serializer_class = InvoiceSalesSerializer
+    queryset = InvoiceSales.objects.all().order_by('-created_at')
+    filterset_fields = ['wholesaler_ugo', 'store_ugo', 'created_at']
+
+
+class InvoiceSalesShowDetailView(RetrieveAPIView):
+    serializer_class = InvoiceSalesSerializer
+    queryset = InvoiceSales.objects.all()
+
+    def retrieve(self, request: Request, *args, **kwargs) -> Response:
+        translate(request)
+        instance = self.get_object()
+        serializer = self.serializer_class(instance=instance, many=False)
+        item_instance = InvoiceSalesItem.objects.filter(invoice_sales_id_id=serializer.data['id'])
+        # item_instance = InvoiceSalesItem.objects.filter(is_id_id=serializer.data['id'])
+        item_serializer = InvoiceSalesItemSerializer(instance=item_instance, many=True)
+        return Response(data={'invoice': serializer.data, 'items': item_serializer.data},
+                        status=status.HTTP_200_OK)
+
+
+class InvoiceSalesShowDetailWholesalerView(GenericAPIView):
+    serializer_class = InvoiceSalesSerializer
+    queryset = InvoiceSales.objects.all()
+    lookup_field = 'wholesaler_ugo'
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        translate(request)
+        invoice_entry = InvoiceSales.objects.filter(wholesaler_ugo_id=self.kwargs['wholesaler_ugo'])
+        # invoice_entry = InvoiceSales.objects.filter(u_wholesaler_id_id=self.kwargs['u_wholesaler_id'])
+        serializer = self.serializer_class(instance=invoice_entry, many=True)
+        return Response(data=serializer.data,
+                        status=status.HTTP_200_OK)
+
+
+class InvoiceSalesShowDetailStoreView(GenericAPIView):
+    serializer_class = InvoiceSalesSerializer
+    queryset = InvoiceSales.objects.all()
+    lookup_field = 'store_ugo'
+
+    def get(self, request: Request, *args, **kwargs):
+        translate(request)
+        invoice_entry = InvoiceSales.objects.filter(store_ugo_id=self.kwargs['store_ugo'])
+        # invoice_entry = InvoiceSales.objects.filter(u_store_id_id=self.kwargs['u_store_id'])
+        serializer = self.serializer_class(instance=invoice_entry, many=True)
+        return Response(data=serializer.data,
+                        status=status.HTTP_200_OK)
