@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.Home.as_view())
+    path('create/complaint/', views.ComplaintView.as_view())
 
 
 ]

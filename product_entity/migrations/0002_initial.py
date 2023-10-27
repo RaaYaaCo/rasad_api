@@ -9,14 +9,14 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('invoice_entry', '0001_initial'),
+        ('product_entity', '0001_initial'),
         ('user', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='invoiceentry',
-            name='wholesaler_id',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='user.usergrouporganization', verbose_name='wholesaler'),
+            model_name='productentity',
+            name='store_ugo',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='storeProductEntity', to='user.usergrouporganization', verbose_name='store'),
         ),
     ]
