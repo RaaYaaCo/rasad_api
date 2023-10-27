@@ -1,11 +1,12 @@
+from django.contrib.auth.models import Group
 from django.utils.translation import gettext as _
 
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, UpdateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import User, UserGroupOrganization
+from .models import User, UserGroupOrganization, Organization
 from . import serializers
 from .utils import code, get_tokens
 from rasad_api import settings
@@ -110,6 +111,16 @@ class LoginOtpView(GenericAPIView):
                 user.is_active = True
                 user.save()
 
+                group = Group.objects.get(name='مشتری')
+                group.user_set.add(user)
+
+                organization = Organization.objects.get(code='00000')
+                ugo = UserGroupOrganization.objects.create(
+                    u_id=user,
+                    g_id=group,
+                    o_id=organization
+                )
+
                 tokens = get_tokens(user)
                 access_token = tokens['Access']
                 refresh_token = tokens['Refresh']
@@ -127,3 +138,8 @@ class LoginOtpView(GenericAPIView):
             return Response({'msg': _('otp code is not valid')}, status.HTTP_400_BAD_REQUEST)
         except:
             return Response({'msg': _('otp code is not valid')}, status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileView(RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserProfileSerializer
