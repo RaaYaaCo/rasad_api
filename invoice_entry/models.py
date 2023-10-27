@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext as _
-
+from django.core.exceptions import ValidationError
 from user.models import UserGroupOrganization
 from product.models import Product
 
@@ -21,7 +21,7 @@ class InvoiceEntry(models.Model):
 
     def save(self, *args, **kwargs):
         if self.wholesaler_id.g_id.name != 'عمده فروش':
-            raise _('your request can not accept')
+            raise ValidationError(_('your request can not accept'))
         else:
             return super().save(*args, **kwargs)
 
