@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext as _
+from django.core.exceptions import ValidationError
 
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, UpdateAPIView
 from rest_framework.request import Request
@@ -143,3 +144,13 @@ class LoginOtpView(GenericAPIView):
 class UserProfileView(RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserProfileSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.serializer_class(instance=instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if not instance.is_active:
+            return Response({'msg': _('User not verified')})
+
+        serializer.save()
+        return Response(serializer.data, status.HTTP_202_ACCEPTED)
