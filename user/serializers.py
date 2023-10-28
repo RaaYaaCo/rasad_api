@@ -69,9 +69,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'phone_number', 'code_melli', 'password', 'password2', 'groups']
-        write_only_fields = ['password', 'password2']
-        read_only_fields = ['id', 'phone_number', 'code_melli', 'groups']
+        fields = [
+            'id',
+            'first_name',
+            'last_name',
+            'phone_number',
+            'code_melli',
+            'password',
+            'password2',
+            'groups',
+            'is_active',
+        ]
+        read_only_fields = ['id', 'phone_number', 'code_melli', 'groups', 'is_active']
 
         def update(self, validated_data):
             user = User.objects.update(
@@ -82,7 +91,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             )
 
             return user
-
 
     def validate(self, data):
         password = data.get('password')

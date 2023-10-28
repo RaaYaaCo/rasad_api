@@ -7,7 +7,7 @@ from . import models
 
 @admin.register(models.User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['id', 'phone_number', 'code_melli', 'is_active']
+    list_display = ['id', 'last_name', 'phone_number', 'code_melli', 'is_active']
 
 
 @admin.register(models.Organization)
