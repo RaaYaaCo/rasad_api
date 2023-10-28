@@ -98,3 +98,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if password != password2:
             raise ValidationError(_('The passwords must match'))
         return data
+
+
+class RefreshTokenSerializer(serializers.Serializer):
+    refresh = serializers.CharField(max_length=1500, required=True, label=_('refresh'))

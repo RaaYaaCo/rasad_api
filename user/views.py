@@ -1,11 +1,11 @@
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext as _
-from django.core.exceptions import ValidationError
 
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, UpdateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from .models import User, UserGroupOrganization, Organization
 from . import serializers
@@ -154,3 +154,36 @@ class UserProfileView(RetrieveUpdateAPIView):
 
         serializer.save()
         return Response(serializer.data, status.HTTP_202_ACCEPTED)
+
+
+class RefreshTokenView(GenericAPIView):
+    serializer_class = serializers.RefreshTokenSerializer
+
+    def post(self, request: Request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid()
+        try:
+            refresh_token = settings.REDIS_JWT_TOKEN.get(name=serializer.data['refresh'])
+            t_refresh = RefreshToken(refresh_token)
+            user = User.objects.get(id=t_refresh['user_id'])
+            settings.REDIS_JWT_TOKEN.delete(serializer.data['refresh'])
+            token = get_tokens(user)
+            access = token['Access']
+            refresh = token['Refresh']
+            settings.REDIS_JWT_TOKEN.set(name=refresh, value=refresh, ex=settings.REDIS_REFRESH_TIME)
+            return Response({'access': access, 'refresh': settings.REDIS_JWT_TOKEN.get(refresh)})
+        except:
+            return Response({'msg': _('Token is invalid or expired')}, status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(GenericAPIView):
+    serializer_class = serializers.RefreshTokenSerializer
+
+    def post(self, request: Request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid()
+        try:
+            settings.REDIS_JWT_TOKEN.delete(serializer.data['refresh'])
+            return Response({'msg': _('logout ok')}, status.HTTP_200_OK)
+        except:
+            return Response({'msg': 'Token is invalid or expired'}, status.HTTP_400_BAD_REQUEST)
