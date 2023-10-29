@@ -29,7 +29,7 @@ class Complaint(models.Model):
     store_id = models.ForeignKey(UserGroupOrganization, on_delete=models.PROTECT, verbose_name=_('store id'),
                                  related_name='store_id')
     is_read_by_admin = models.BooleanField(default=False, db_index=True, verbose_name=_('is read by admin'))
-    status = models.ForeignKey(ComplaintStatus, db_index=True, on_delete=models.PROTECT,
+    status = models.ForeignKey(ComplaintStatus, db_index=True, on_delete=models.PROTECT,default=None,
                                verbose_name=_('status'))
     response = models.ForeignKey(ComplaintResponse, on_delete=models.CASCADE, blank=True, null=True,
                                  verbose_name=_('response'))
@@ -38,7 +38,7 @@ class Complaint(models.Model):
 
     def save(self, *args, **kwargs):
         if self.user.u_id.id == self.store_id.id:
-            raise ValidationError(_("User cannot file a complaint for themselves."))
+            raise ValidationError(_("User cannot file a complaint for themselves."))    
         super().save(*args, **kwargs)
 
     def __str__(self):

@@ -7,7 +7,7 @@ from .serializers import ComplaintSerializer
 from .models import Complaint
 
 
-class ComplaintView(generics.GenericAPIView):
+class CreateComplaintView(generics.GenericAPIView):
     serializer_class = ComplaintSerializer
     queryset = Complaint
 
